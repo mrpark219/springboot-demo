@@ -5,3 +5,18 @@ logging:
       springframework:
         boot:
           autoconfigure: ERROR
+
+spring:
+  datasource:
+    password: '1234'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: springboot_demo
+    url: jdbc:mysql://localhost:3306/springboot_demo?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        #show_sql: true
+        format_sql: true
