@@ -1,0 +1,52 @@
+services:
+  mysql:
+    image: mysql:8.0.40
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+    container_name: springboot-demo-mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --lower_case_table_names=1
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: "no"
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+
+  redis:
+    image: redis:8.0-M02
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  springboot-demo:
+    image: springboot-demo:1.0.0
+    container_name: springboot-demo-springboot
+    ports:
+      - "8080:8080"
+    links:
+      - mysql
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_USERNAME=springboot_demo
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/springboot_demo?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+
+
